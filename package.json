@@ -14,13 +14,16 @@
     "lint:fix": "eslint . --fix",
     "db:new": "dbmate new",
     "db:up": "dbmate up",
-    "db:down": "dbmate rollback"
+    "db:down": "dbmate rollback",
+    "db:seed": "tsx src/scripts/seed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/eslint-plugin-security": "^3.0.1",
     "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
+    "dotenv": "^17.4.2",
+    "dotenv-expand": "^1000.0.0",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-security": "^4.0.1",
