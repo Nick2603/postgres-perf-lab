@@ -25,9 +25,8 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /app/dist ./dist
-COPY db/migrations ./db/migrations
-COPY db/schema.sql ./db/schema.sql
- 
+COPY db ./db
+
 COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 

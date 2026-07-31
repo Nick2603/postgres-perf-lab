@@ -6,7 +6,8 @@ import { envSchema } from './env.schema.js';
 export const configPlugin = fp(async (app: FastifyInstance) => {
   await app.register(fastifyEnv, {
     schema: envSchema,
-    dotenv: process.env.NODE_ENV !== 'production',
+    dotenv: true,
+    expandEnv: true,
     confKey: 'config',
   });
 });

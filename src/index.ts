@@ -11,7 +11,7 @@ const start = async (): Promise<void> => {
       return { status: 'ok' };
     });
 
-    await app.listen({ port: app.config.PORT, host: '0.0.0.0' });
+    await app.listen({ port: app.config.PORT, host: app.config.HOST });
   } catch (err) {
     app.log.error(err);
 

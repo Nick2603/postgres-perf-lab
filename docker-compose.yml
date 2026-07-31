@@ -2,6 +2,8 @@ services:
   postgres:
     image: postgres:18.4-trixie
     restart: unless-stopped
+    networks:
+      - perf-lab
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -9,7 +11,7 @@ services:
     ports:
       - '${POSTGRES_PORT:-5432}:5432'
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
@@ -18,14 +20,16 @@ services:
       start_period: 5s
 
   pgbouncer:
-    image: edoburu/pgbouncer:latest
+    image: edoburu/pgbouncer:v1.25.2-p0
     restart: unless-stopped
+    networks:
+      - perf-lab
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       DB_HOST: postgres
-      DB_PORT: 5432
+      DB_PORT: ${POSTGRES_PORT:-5432}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
@@ -33,11 +37,11 @@ services:
       AUTH_TYPE: scram-sha-256
       MAX_CLIENT_CONN: 200
       DEFAULT_POOL_SIZE: 20
-      LISTEN_PORT: 6432
+      LISTEN_PORT: ${PGBOUNCER_PORT:-6432}
     ports:
       - '${PGBOUNCER_PORT:-6432}:6432'
     healthcheck:
-      test: ['CMD-SHELL', 'nc -z localhost 6432 || exit 1']
+      test: ['CMD', 'pg_isready', '-h', 'localhost', '-p', '${PGBOUNCER_PORT:-6432}']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -48,10 +52,12 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    networks:
+      - perf-lab
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy
@@ -62,3 +68,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  perf-lab:
+    driver: bridge

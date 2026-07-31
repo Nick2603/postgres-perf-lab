@@ -5,12 +5,29 @@
  */
 export const envSchema = {
   type: 'object',
-  required: ['DATABASE_URL'],
+  required: [
+    'NODE_ENV',
+    'HOST',
+    'PORT',
+    'DATABASE_URL',
+    'PG_POOL_MAX',
+    'PG_POOL_IDLE_TIMEOUT_MS',
+    'PG_POOL_CONNECTION_TIMEOUT_MS',
+    'POSTGRES_USER',
+    'POSTGRES_PASSWORD',
+    'POSTGRES_DB',
+    'POSTGRES_PORT',
+    'PGBOUNCER_PORT',
+  ],
   properties: {
     NODE_ENV: {
       type: 'string',
       enum: ['development', 'production', 'test'],
       default: 'development',
+    },
+    HOST: {
+      type: 'string',
+      default: '0.0.0.0',
     },
     PORT: {
       type: 'integer',
@@ -36,6 +53,11 @@ export const envSchema = {
       minimum: 0,
       default: 5000,
     },
+    POSTGRES_USER: { type: 'string' },
+    POSTGRES_PASSWORD: { type: 'string' },
+    POSTGRES_DB: { type: 'string' },
+    POSTGRES_PORT: { type: 'integer', minimum: 1 },
+    PGBOUNCER_PORT: { type: 'integer', minimum: 1 },
   },
 } as const;
 
@@ -47,6 +69,7 @@ export const envSchema = {
 export interface EnvConfig {
   NODE_ENV: 'development' | 'production' | 'test';
   PORT: number;
+  HOST: string;
   DATABASE_URL: string;
   PG_POOL_MAX: number;
   PG_POOL_IDLE_TIMEOUT_MS: number;
