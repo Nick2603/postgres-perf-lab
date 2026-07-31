@@ -18,6 +18,7 @@ export const envSchema = {
     'POSTGRES_DB',
     'POSTGRES_PORT',
     'PGBOUNCER_PORT',
+    'PGBOUNCER_URL',
   ],
   properties: {
     NODE_ENV: {
@@ -58,6 +59,10 @@ export const envSchema = {
     POSTGRES_DB: { type: 'string' },
     POSTGRES_PORT: { type: 'integer', minimum: 1 },
     PGBOUNCER_PORT: { type: 'integer', minimum: 1 },
+    PGBOUNCER_URL: {
+      type: 'string',
+      pattern: '^postgres(ql)?://',
+    },
   },
 } as const;
 
@@ -74,4 +79,5 @@ export interface EnvConfig {
   PG_POOL_MAX: number;
   PG_POOL_IDLE_TIMEOUT_MS: number;
   PG_POOL_CONNECTION_TIMEOUT_MS: number;
+  PGBOUNCER_URL: string;
 }
