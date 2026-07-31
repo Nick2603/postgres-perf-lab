@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "types": ["k6"],
+    "checkJs": false
+  }
+}

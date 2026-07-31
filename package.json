@@ -15,11 +15,14 @@
     "db:new": "dbmate new",
     "db:up": "dbmate up",
     "db:down": "dbmate rollback",
-    "db:seed": "tsx src/scripts/seed.ts"
+    "db:seed": "tsx src/scripts/seed.ts",
+    "k6:smoke": "k6 run k6/categories.smoke.js",
+    "k6:load": "k6 run k6/categories.load.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/eslint-plugin-security": "^3.0.1",
+    "@types/k6": "^2.0.1",
     "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",

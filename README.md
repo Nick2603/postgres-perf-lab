@@ -20,6 +20,14 @@ Feature code is organized by domain module, following a three-layer
 pattern inspired by NestJS's structure, adapted for plain Fastify:
 
 ```
+k6/
+  helpers.js                   ← shared BASE_URL / header helpers
+  categories.smoke.js          ← fast correctness check: full CRUD cycle, 1 VU
+  categories.load.js           ← staged ramp-up load test (1 → 50 VUs), using setup() to fetch real seeded category IDs rather than hitting random/nonexistent ones
+db/
+  migrations/                  ← raw .sql migration files (dbmate)
+  schema.sql                   ← generated schema dump, committed to git
+  seed.sql                     ← idempotent, set-based seed data generator
 src/
   config/
     config.plugin.ts             ← @fastify/env config, validated at startup
@@ -34,9 +42,6 @@ src/
       categories.schemas.ts      ← TypeBox schemas + inferred TS types
       categories.module.ts       ← wires the three layers, exports one plugin
     v1.ts                        ← aggregates all v1 modules under one prefix
-  plugins/
-    config.plugin.ts             ← @fastify/env config, validated at startup
-    db.plugin.ts                 ← @fastify/postgres pool, routed through PgBouncer
   types/
     fastify.d.ts                 ← FastifyInstance type augmentations, centralized
   app.ts                         ← builds the Fastify instance (no .listen())
@@ -84,6 +89,33 @@ realistic, **skewed** data entirely in set-based SQL (no per-row loops):
   - `PGBOUNCER_URL` — routed through PgBouncer, used by the running app
 - Config validated at startup via `@fastify/env`; missing or malformed env
   vars fail loudly before the server starts
+
+## Load testing (k6)
+
+Load and smoke tests live in `k6/`, kept as **plain JavaScript**. Since these scripts should stay
+portable and framework-agnostic, they're intentionally decoupled from the
+app's TypeScript build pipeline and excluded from ESLint/`tsc` entirely.
+
+**Install k6** (standalone binary):
+```bash
+winget install k6 --source winget
+```
+
+**Run:**
+```bash
+npm run k6:smoke
+npm run k6:load
+```
+
+The load test enforces thresholds (`p(95)<500ms`, `<1%` failure rate) and
+uses `setup()` — a k6 lifecycle hook that runs once before the load stages
+begin — to pull real category IDs from the seeded database, so "get one"
+requests exercise genuine reads instead of mostly hitting 404s.
+
+**Baseline result** (categories module, ~15 seeded rows, up to 50 concurrent
+VUs): p(95) latency of ~5.7ms, 0% error rate. Expected to look very
+different — and become genuinely informative — once run against `orders`
+at full seeded scale, and again after Module 7's indexing/pooling work.
 
 ## Setup
 

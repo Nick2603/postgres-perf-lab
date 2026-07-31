@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig([
   {
-    ignores: ['dist', 'node_modules'],
+    ignores: ['dist', 'node_modules', 'k6'],
   },
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
