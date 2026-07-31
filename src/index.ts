@@ -1,25 +1,9 @@
-import Fastify from 'fastify';
-import { configPlugin } from './config/config.plugin.js';
-import { dbPlugin } from './db/db.plugin.js';
+import { buildApp } from './app.js';
 
-const app = Fastify({ logger: true });
+const app = await buildApp();
 
 const start = async (): Promise<void> => {
   try {
-    await app.register(configPlugin);
-
-    await app.register(dbPlugin);
-
-    app.get('/health', () => {
-      return { status: 'ok' };
-    });
-
-    app.get('/health/db', async (request) => {
-      const result = await request.server.pg.query('SELECT 1');
-
-      return { ok: result.rowCount === 1 };
-    });
-
     await app.listen({ port: app.config.PORT, host: app.config.HOST });
   } catch (err) {
     app.log.error(err);

@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Pool } from 'pg';
 
-// eslint-disable-next-line
 expand(config());
 
 async function main(): Promise<void> {

@@ -35,5 +35,11 @@ export default defineConfig([
     },
   },
   pluginSecurity.configs.recommended,
+  {
+    files: ['**/*.controller.ts', '**/*.module.ts', '**/plugins/**/*.ts'],
+    rules: {
+      '@typescript-eslint/require-await': 'off',
+    },
+  },
   eslintConfigPrettier,
 ]);
